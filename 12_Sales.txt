@@ -1,0 +1,55 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+# Step 1: Import the "Retail_Sales_Data.csv" dataset
+sales_data = pd.read_csv("Retail_Sales.csv")
+
+
+sales_data.head()
+sales_data.info()
+sales_data.columns
+
+# Step 3: Identify relevant variables for aggregation
+state_column = 'Region'
+sales_column = 'Sales_Amount'
+category_column = 'Product_category'
+
+
+# Grouping sales data by region and calculating total sales amount
+sales_by_region = sales_data.groupby('Region')['Sales_Amount'].sum().reset_index()
+print(sales_by_region)
+
+
+# Creating a bar plot to visualize sales distribution by region
+plt.figure(figsize=(10, 6))
+plt.bar(sales_by_region['Region'], sales_by_region['Sales_Amount'])
+plt.xlabel('Region')
+plt.ylabel('Total Sales Amount')
+plt.title('Sales Distribution by Region')
+plt.xticks(rotation=45)  
+plt.show()
+
+
+
+
+# Step 6: Identify the top-performing state based on the highest sales amount
+top_region = sales_by_region[sales_by_region['Sales_Amount'] == sales_by_region['Sales_Amount'].max()]
+print("Top Performing Region: ", top_region)
+
+
+
+# Step 7: Group the sales data by state and shop category to calculate the total sales amount for each combination
+sales_by_region_category = sales_data.groupby(['Region', 'Product_category'])['Sales_Amount'].sum().reset_index()
+print(sales_by_region_category)
+
+
+# created a stacked bar
+plt.figure(figsize=(16, 12))
+sales_pivot = sales_by_region_category.pivot_table(index='Region', columns='Product_category', values='Sales_Amount', fill_value=0)
+sales_pivot.plot(kind='bar', stacked=True)
+plt.xlabel('Region')
+plt.ylabel('Total Sales Amount')
+plt.title('Sales Amount by Region and Product Category')
+plt.legend(title='Product Category', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.show()

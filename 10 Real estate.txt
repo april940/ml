@@ -1,0 +1,62 @@
+!pip install pandas
+!pip install seaborn
+!pip install scipy
+!pip install numpy
+!pip install scikit-learn
+
+# Import required libraries
+import pandas as pd
+import seaborn as sns
+from scipy import stats
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
+
+# Load the dataset from the specified file path
+file_path = ("C:/Users/Samiksha/OneDrive/Desktop/Final datasets/BE AIDS DATASETS/Data Modelling and Visualization/Assignment 10/RealEstate_price.csv")
+df = pd.read_csv(file_path)
+
+# Check for missing values in the dataset
+df.isna().sum()
+
+# Display the column names
+df.columns
+
+# Display the first few rows of the dataset
+df.head
+
+# Filter the dataset to select rows with more than 0 bedrooms
+df_with_bedroom = df[df["Bedrooms"] > 0]
+df_with_bedroom.shape
+
+# Filter the dataset to select rows with square footage within a specified range
+lim_area = df[(df['SqFt'] > 4000) & (df['SqFt'] < 9500)]
+lim_area
+
+# Filter the dataset to select rows where 'Brick' is 'yes'
+brick_yes = df[df['Brick'] == 'yes']
+brick_yes
+
+# Use LabelEncoder to encode categorical columns
+df[['Home', 'Price', 'SqFt', 'Bedrooms', 'Bathrooms', 'Offers', 'Brick', 'Neighborhood', 'Sales_date']] = df[['Home', 'Price', 'SqFt', 'Bedrooms', 'Bathrooms', 'Offers', 'Brick', 'Neighborhood', 'Sales_date']].apply(LabelEncoder().fit_transform)
+df.head()
+
+# Create boxplots for 'Price' and 'SqFt' using Seaborn
+sns.boxplot(df['Price'])
+sns.boxplot(df['SqFt'])
+
+# Calculate and display the z-scores for 'Price'
+z = np.abs(stats.zscore(df['Price']))
+print(z)
+
+# Find and display the indices where z-scores are greater than 1.5
+print(np.where(z > 1.5))
+
+# Calculate the interquartile range (IQR) for 'Price'
+Q1 = np.percentile(df['Price'], 25)
+Q3 = np.percentile(df['Price'], 75)
+IQR = Q3 - Q1
+print("Interquartile Range (IQR):", IQR)
+
+# Calculate and display the mean of 'Price'
+cost = df['Price'].mean()
+print("Real Estate Prices are:", cost.round(2))

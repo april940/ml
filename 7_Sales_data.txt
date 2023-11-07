@@ -1,0 +1,99 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the dataset from a CSV file
+data = pd.read_csv("sample_7.csv")
+data.head()
+
+
+# Select the first two rows
+data1 = data[0:2]
+
+
+# Select the next two rows (rows 3 and 4)
+data2 = data[3:5]
+
+
+# Select the last three rows (starting from row 5 onwards)
+data3 = data[5:]
+
+
+# Display data1
+data1
+
+
+# Display data2
+data2
+
+
+# Display data3
+data3
+
+
+# Convert data1 to JSON format
+data1_json = data1.to_json(orient='records')
+
+
+# Write data1 JSON to a file
+with open('data1_json.json', 'w') as file:
+    file.write(data1_json)
+
+
+
+# Convert data2 to Excel format
+data2_excel = data2.to_excel('data2_excel.xlsx', index=False)
+
+
+# Read the JSON file back into a DataFrame
+d11 = pd.read_json('data1_json.json')
+
+
+
+# Read the Excel file back into a DataFrame
+d22 = pd.read_excel('data2_excel.xlsx')
+
+
+# data3 remains the same
+d33 = data3
+
+
+# Concatenate the three DataFrames into one
+frames = [d11, d22, d33]
+dataf = pd.concat(frames)
+
+
+# Check for missing values in the combined DataFrame
+dataf.isna().sum()
+
+
+# Fill missing values with forward fill method
+dataf.fillna(method='ffill', inplace=True)
+
+
+# Display the cleaned and combined DataFrame
+dataf
+
+
+
+# Generate summary statistics for the DataFrame
+dataf.describe()
+
+
+
+# Group the data by 'Channel' and calculate the sum of 'Sales'
+dataf.groupby('Channel').agg({'Sales': pd.Series.sum})
+
+
+
+# Create a bar plot using Seaborn
+sns.barplot(x=dataf['Address'], y=dataf['Sales'])
+plt.show()
+
+
+
+# Create a pie chart using Matplotlib
+plt.pie(x=dataf['Sales'], labels=dataf['P Type'])
+plt.show()
+

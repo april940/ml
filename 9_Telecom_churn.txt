@@ -1,0 +1,105 @@
+import pandas as pd
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import confusion_matrix, classification_report
+import numpy as np
+
+# Load the dataset
+data = pd.read_csv("tele_com.csv")
+data.head()
+
+
+# Check for missing values
+data.isna().sum()
+
+# Get the shape of the dataset
+data.shape
+
+# Drop rows with missing values
+data.dropna(inplace=True)
+
+# Check for and remove duplicate rows
+data.duplicated().sum()
+
+# Check data types
+data.dtypes
+
+# Identify outliers in 'TotalCharges' column using quantiles
+up = np.quantile(data['TotalCharges'], 0.75)
+dn = np.quantile(data['TotalCharges'], 0.25)
+
+
+# Filter and get data without outliers
+data1 = data[(data['TotalCharges'] < dn) | (data['TotalCharges'] > up)]
+data1
+
+
+# Get the indices of outliers
+out_ind = data1.index
+
+
+# Remove rows with outliers
+data.drop(out_ind, inplace=True)
+
+
+# Initialize StandardScaler and LabelEncoder
+s = StandardScaler()
+le = LabelEncoder()
+
+
+
+# Encode categorical columns
+data[['gender', 'Partner', 'Dependents', 'PhoneService', 'MultipleLines', 'InternetService',
+      'OnlineSecurity', 'OnlineBackup', 'DeviceProtection', 'TechSupport',
+      'StreamingTV', 'StreamingMovies', 'Contract', 'PaperlessBilling',
+      'PaymentMethod', 'Churn']] = data[['gender', 'Partner', 'Dependents', 'PhoneService', 'MultipleLines', 'InternetService',
+                                       'OnlineSecurity', 'OnlineBackup', 'DeviceProtection', 'TechSupport',
+                                       'StreamingTV', 'StreamingMovies', 'Contract', 'PaperlessBilling',
+                                       'PaymentMethod', 'Churn']].apply(le.fit_transform)
+
+
+
+# Split the data into features (X) and target variable (y)
+X = data.drop(columns=['customerID', 'Churn'])
+y = data['Churn']
+
+
+
+# Split the data into a training and testing set
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+
+# Create an SVM classifier with a linear kernel and regularization parameter C=1
+clf = SVC(kernel='linear', C=1)
+
+
+
+# Train the SVM classifier on the training data
+clf.fit(X_train, y_train)
+
+
+# Predict on the test data
+y_pred = clf.predict(X_test)
+
+
+
+# Compute the confusion matrix
+confusion_mat = confusion_matrix(y_test, y_pred)
+print("Confusion Matrix:\n", confusion_mat)
+
+
+# Count the values of 'Churn' in the test set
+churn_value_counts = y_test.value_counts()
+print("\nChurn Value Counts:\n", churn_value_counts)
+
+
+
+# Generate a classification report
+class_report = classification_report(y_test, y_pred)
+print("\nClassification Report:\n", class_report)
+
+
+
+
